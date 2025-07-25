@@ -1,5 +1,3 @@
-pip install streamlit opencv-python dlib ultralytics
 streamlit
 opencv-python
 ultralytics
-dlib
