@@ -5,21 +5,19 @@ from ultralytics import YOLO
 
 st.set_page_config(page_title="AI Driving Test", layout="centered")
 st.title("🚗 AI Driving Test – Cone Detection Only")
-st.write("This app detects cones in a driving test video using AI (YOLOv5s).")
+st.write("Upload a driving test video. This app will analyze for cones and people using AI (YOLOv5s).")
 
 # Load YOLOv5s model
 model = YOLO('yolov5s')
 
 # Upload video
-video_file = st.file_uploader("📤 Upload driving test video", type=["mp4", "mov", "avi"])
+video_file = st.file_uploader("📤 Upload your driving test video (.mp4, .mov)", type=["mp4", "mov", "avi"])
 
 if video_file:
-    # Save video to temp file
-    temp_video = tempfile.NamedTemporaryFile(delete=False)
-    temp_video.write(video_file.read())
-    video_path = temp_video.name
+    tfile = tempfile.NamedTemporaryFile(delete=False)
+    tfile.write(video_file.read())
+    video_path = tfile.name
 
-    # Show uploaded video
     st.video(video_file)
 
     if st.button("▶️ Run AI Test"):
@@ -32,10 +30,9 @@ if video_file:
             ret, frame = cap.read()
             if not ret:
                 break
-
             frame_count += 1
             if frame_count % 10 != 0:
-                continue  # Every 10th frame
+                continue
 
             display_frame = frame.copy()
 
@@ -60,14 +57,13 @@ if video_file:
 
         cap.release()
 
-        # Show preview
         if last_frame is not None:
             st.image(cv2.cvtColor(last_frame, cv2.COLOR_BGR2RGB),
-                     caption="📸 Detection Preview", use_column_width=True)
+                     caption="📸 Detected Frame", use_column_width=True)
 
-        # Final Result
+        # Result
         st.subheader("📊 Final Result")
         if not cone_detected:
-            st.success("✅ PASS: No cone or person detected.")
+            st.success("✅ PASS: No cones or people detected.")
         else:
-            st.error("❌ FAIL: Cone or person detected in path.")
+            st.error("❌ FAIL: Cone or person detected.")
